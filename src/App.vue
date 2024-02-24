@@ -1,5 +1,5 @@
 <template>
-  <div class="wrapper">
+  <div class="wrapper h-[10000px]">
     <base-header></base-header>
     <div class="mx-4">
       <div class="flex justify-center items-center my-4">
@@ -24,7 +24,7 @@
 
 <script setup lang="ts">
 import { ref, watch, onMounted } from 'vue';
-import { usePointer, useWindowSize, useElementSize, useWindowScroll } from '@vueuse/core';
+import { usePointer, useWindowSize, useElementSize, useElementBounding, useWindowScroll } from '@vueuse/core';
 
 import BaseHeader from './components/BaseHeader.vue'
 import mainImg from '@/components/icons/main.svg'
@@ -36,8 +36,8 @@ const wrapperEl = ref();
 const point = usePointer();
 const { width } = useWindowSize();
 const { width: elWidth, height: elHeight } = useElementSize(elVideo)
-const { width: wrapperWidth } = useElementSize(wrapperEl)
-const { y: scrollY } = useWindowScroll();
+const { width: wrapperWidth, y: wrapperY } = useElementBounding(wrapperEl)
+const { y: winScrollY } = useWindowScroll();
 
 const updateElement = (cursorX: number, scrollY: number) => {
   let x = cursorX;
@@ -48,6 +48,11 @@ const updateElement = (cursorX: number, scrollY: number) => {
   }
   x -= elWidth.value / 2;
   elVideo.value.style.left = `${x}px`;
+
+  if (wrapperY.value < 0) {
+    scrollY -= -wrapperY.value;
+  }
+  console.log(scrollY, wrapperY.value)
   elVideo.value.style.top = `${124 + scrollY}px`;
   
   let resWidth = 300 + scrollY * 2;
@@ -59,9 +64,9 @@ const updateElement = (cursorX: number, scrollY: number) => {
 } 
 
 watch(point.x, (newval: number) => {
-  updateElement(newval, scrollY.value);
+  updateElement(newval, winScrollY.value);
 })
-watch(scrollY, (newval) => {
+watch(winScrollY, (newval) => {
   updateElement(point.x.value, newval);
 })
 watch(elHeight, newval => wrapperEl.value.style.height = `${newval}px`)
