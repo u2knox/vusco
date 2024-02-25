@@ -1,7 +1,7 @@
 <template>
   <div class="wrapper h-[10000px]">
     <base-header></base-header>
-    <div class="mx-4">
+    <div class="mx-4 lg:mx-16">
       <div class="flex justify-center items-center my-4">
         <img :src="mainImg" alt="main" style="width: 90vw" />
       </div>
@@ -11,9 +11,9 @@
         <img :src="iconArrowRight" alt="arrow right" />
       </button>
       <div class="mt-20" ref="wrapperEl">
-        <div ref="elVideo" class="absolute top-[124px] w-[300px] ease-linear duration-300">
+        <div ref="elVideo" class="md:absolute top-[132px] w-[300px] ease-linear duration-200 cursor-pointer">
           <video class="rounded-lg" autoplay loop muted playsinline >
-            <source src="https://download-video.akamaized.net/v3-1/playback/7b5f11b5-19b7-4096-b971-b1422ff988cb/6992667f-4e6b67a3?__token__=st=1708768124~exp=1708782524~acl=%2Fv3-1%2Fplayback%2F7b5f11b5-19b7-4096-b971-b1422ff988cb%2F6992667f-4e6b67a3%2A~hmac=3bdca1513e447e1e1adcda60dc0ade95b614258f9dc3d6bb7e79ced62e1af961&r=dXMtd2VzdDE%3D">
+            <source src="/public/vusco.mp4">
           </video>
           <h5>Showreel 2024</h5>
         </div>
@@ -40,22 +40,24 @@ const { width: wrapperWidth, y: wrapperY } = useElementBounding(wrapperEl)
 const { y: winScrollY } = useWindowScroll();
 
 const updateElement = (cursorX: number, scrollY: number) => {
+  const padding = width.value >= 960 ? 60 : 16;
+
   let x = cursorX;
-  if (x > width.value - elWidth.value / 2 - 32) {
-    x = width.value - elWidth.value / 2 - 32;
-  } else if (x < elWidth.value / 2 + 16) {
-    x = elWidth.value / 2 + 16;
+  if (x > width.value - elWidth.value / 2 - padding * 2) {
+    x = width.value - elWidth.value / 2 - padding * 2;
+  } else if (x < elWidth.value / 2 + padding) {
+    x = elWidth.value / 2 + padding;
   }
-  x -= elWidth.value / 2;
-  elVideo.value.style.left = `${x}px`;
 
   if (wrapperY.value < 0) {
     scrollY -= -wrapperY.value;
+    x = elWidth.value / 2 + padding;
   }
-  console.log(scrollY, wrapperY.value)
-  elVideo.value.style.top = `${124 + scrollY}px`;
+  x -= elWidth.value / 2;
+  elVideo.value.style.left = `${x}px`;
+  elVideo.value.style.top = `${132 + scrollY}px`;
   
-  let resWidth = 300 + scrollY * 2;
+  let resWidth = 300 + scrollY * 1.5;
   if (resWidth > wrapperWidth.value) {
     resWidth = wrapperWidth.value;
   }
